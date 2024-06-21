@@ -1,0 +1,56 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
+public class UrlShortener {
+
+    private static final char[] CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+    private static final int SHORT_URL_LENGTH = 6;
+    private final Map<String, String> urlMap;
+
+    public UrlShortener() {
+        urlMap = new HashMap<>();
+    }
+
+    public String shortenUrl(String longUrl) {
+        if (urlMap.containsKey(longUrl)) {
+            return urlMap.get(longUrl);
+        }
+
+        StringBuilder shortUrlBuilder = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < SHORT_URL_LENGTH; i++) {
+            shortUrlBuilder.append(CHARS[random.nextInt(CHARS.length)]);
+        }
+        String shortUrl = shortUrlBuilder.toString();
+
+        while (urlMap.containsKey(shortUrl)) {
+            // Handle potential collisions by generating a new shortUrl
+            shortUrlBuilder.setLength(0);
+            for (int i = 0; i < SHORT_URL_LENGTH; i++) {
+                shortUrlBuilder.append(CHARS[random.nextInt(CHARS.length)]);
+            }
+            shortUrl = shortUrlBuilder.toString();
+        }
+
+        urlMap.put(shortUrl, longUrl);
+        return shortUrl;
+    }
+
+    public String getLongUrl(String shortUrl) {
+        return urlMap.get(shortUrl);
+    }
+
+    public static void main(String[] args) {
+        UrlShortener shortener = new UrlShortener();
+
+        String longUrl = "https://www.example.com/a/very/long/url/to/shorten";
+        String shortUrl = shortener.shortenUrl(longUrl);
+
+        System.out.println("Original URL: " + longUrl);
+        System.out.println("Shortened URL: " + shortUrl);
+
+        String originalUrl = shortener.getLongUrl(shortUrl);
+        System.out.println("Redirected to: " + originalUrl);
+    }
+}
